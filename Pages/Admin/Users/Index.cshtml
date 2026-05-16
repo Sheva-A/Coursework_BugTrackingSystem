@@ -1,0 +1,113 @@
+@page
+@model BugTrackingSystem.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = "Управління користувачами";
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Користувачі</h1>
+    <span class="badge bg-secondary fs-6">Всього: @Model.Users.Count</span>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Користувач</th>
+                    <th>Ролі</th>
+                    <th class="text-center" title="Авторство багів">Автор</th>
+                    <th class="text-center" title="Призначених багів">Призначено</th>
+                    <th class="text-center" title="Кількість проєктів">Проєкти</th>
+                    <th class="text-end">Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Users)
+                {
+                    var isSelf   = row.User.Id == currentUserId;
+                    var isAdmin  = row.Roles.Contains("Admin");
+
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">@row.User.UserName</div>
+                            <div class="text-muted small">@row.User.Email</div>
+                        </td>
+                        <td>
+                            @foreach (var role in row.Roles)
+                            {
+                                var roleClass = role switch
+                                {
+                                    "Admin"     => "bg-danger",
+                                    "Manager"   => "bg-warning text-dark",
+                                    "Developer" => "bg-primary",
+                                    "Tester"    => "bg-info text-dark",
+                                    _           => "bg-secondary"
+                                };
+                                <span class="badge @roleClass me-1">@role</span>
+                            }
+                            @if (!row.Roles.Any())
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (row.AuthoredBugs > 0)
+                            {
+                                <span class="badge bg-secondary">@row.AuthoredBugs</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">0</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (row.AssignedBugs > 0)
+                            {
+                                <span class="badge bg-secondary">@row.AssignedBugs</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">0</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (row.ProjectCount > 0)
+                            {
+                                <span class="badge bg-secondary">@row.ProjectCount</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">0</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (!isSelf && !isAdmin)
+                            {
+                                <a asp-page="./Delete" asp-route-id="@row.User.Id"
+                                   class="btn btn-sm btn-outline-danger" title="Видалити користувача">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">
+                                    @(isSelf ? "Ви" : "Захищено")
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (!Model.Users.Any())
+{
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-people icon-hero"></i>
+        <p class="mt-3">Користувачів не знайдено.</p>
+    </div>
+}

@@ -1,0 +1,75 @@
+@page
+@model BugTrackingSystem.Pages.Projects.CreateModel
+@{
+    ViewData["Title"] = "Створити проєкт";
+}
+
+<h1><i class="bi bi-folder-plus"></i> Новий проєкт</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Project.Name" class="control-label fw-bold">Назва проєкту</label>
+                        <input asp-for="Project.Name" class="form-control" placeholder="Введіть назву" />
+                        <span asp-validation-for="Project.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Project.Description" class="control-label fw-bold">Опис</label>
+                        <textarea asp-for="Project.Description" class="form-control" rows="3" placeholder="Короткий опис проєкту"></textarea>
+                        <span asp-validation-for="Project.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="fw-bold mb-2">
+                            <i class="bi bi-people"></i> Учасники проєкту
+                        </label>
+                        @if (!Model.AllUsers.Any())
+                        {
+                            <p class="text-muted small">Немає зареєстрованих користувачів.</p>
+                        }
+                        else
+                        {
+                            <div class="border rounded p-2" style="max-height:220px; overflow-y:auto;">
+                                @foreach (var user in Model.AllUsers)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="SelectedUserIds"
+                                               value="@user.Id"
+                                               id="user_@user.Id"
+                                               @(Model.SelectedUserIds.Contains(user.Id) ? "checked" : "") />
+                                        <label class="form-check-label" for="user_@user.Id">
+                                            @user.UserName
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="text-muted small mt-1">Виберіть одного або кількох учасників</div>
+                        }
+                    </div>
+
+                    <div class="form-group mt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Зберегти проєкт
+                        </button>
+                        <a asp-page="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Назад до списку
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

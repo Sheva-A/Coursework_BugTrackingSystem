@@ -1,0 +1,78 @@
+@page "{id:int}"
+@model BugTrackingSystem.Pages.Bugs.EditModel
+@{
+    ViewData["Title"] = "Редагування бага";
+}
+
+<h1><i class="bi bi-pencil-square icon-section"></i> Редагування бага</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="Bug.Id" />
+                    <input type="hidden" asp-for="Bug.AuthorId" />
+                    <input type="hidden" asp-for="Bug.CreatedAt" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Bug.Title" class="fw-bold">Назва</label>
+                        <input asp-for="Bug.Title" class="form-control" />
+                        <span asp-validation-for="Bug.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Bug.Description" class="fw-bold">Опис</label>
+                        <textarea asp-for="Bug.Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Bug.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="Bug.Status" class="fw-bold">Статус</label>
+                            <select asp-for="Bug.Status" class="form-control"
+                                    asp-items="Html.GetEnumSelectList<BugTrackingSystem.Models.BugStatus>()"></select>
+                        </div>
+                        <div class="col">
+                            <label asp-for="Bug.Priority" class="fw-bold">Пріоритет</label>
+                            <select asp-for="Bug.Priority" class="form-control"
+                                    asp-items="Html.GetEnumSelectList<BugTrackingSystem.Models.BugPriority>()"></select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="Bug.ProjectId" class="fw-bold">Проєкт</label>
+                            <select asp-for="Bug.ProjectId" class="form-control" asp-items="Model.ProjectsList">
+                                <option value="">-- Оберіть проєкт --</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label asp-for="Bug.AssignedToId" class="fw-bold">Виконавець</label>
+                            <select asp-for="Bug.AssignedToId" class="form-control" asp-items="Model.UsersList">
+                                <option value="">-- Оберіть виконавця --</option>
+                            </select>
+                            <span asp-validation-for="Bug.AssignedToId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Зберегти зміни
+                        </button>
+                        <a asp-page="./Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Скасувати
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,82 @@
+@page "{id}"
+@model BugTrackingSystem.Pages.Admin.Users.DeleteModel
+@{
+    ViewData["Title"] = "Видалення користувача";
+}
+
+<div class="container" style="max-width:580px;">
+    <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 mb-3"
+             style="width:72px;height:72px;">
+            <i class="bi bi-person-x text-danger icon-hero"></i>
+        </div>
+        <h1 class="h3 fw-bold">Видалення користувача</h1>
+        <p class="text-muted">Цю дію неможливо скасувати.</p>
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="card shadow-sm border-danger border-opacity-25 mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-secondary bg-opacity-10"
+                     style="width:48px;height:48px;">
+                    <i class="bi bi-person text-secondary icon-section"></i>
+                </div>
+                <div>
+                    <div class="fw-bold fs-5">@Model.TargetUser.UserName</div>
+                    <div class="text-muted small">@Model.TargetUser.Email</div>
+                </div>
+            </div>
+            <div class="d-flex gap-1 flex-wrap">
+                @foreach (var role in Model.TargetRoles)
+                {
+                    var roleClass = role switch
+                    {
+                        "Manager"   => "bg-warning text-dark",
+                        "Developer" => "bg-primary",
+                        "Tester"    => "bg-info text-dark",
+                        _           => "bg-secondary"
+                    };
+                    <span class="badge @roleClass">@role</span>
+                }
+                @if (!Model.TargetRoles.Any())
+                {
+                    <span class="text-muted small">Без ролі</span>
+                }
+            </div>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between">
+                <span class="text-muted">Участь у проєктах</span>
+                <strong>@Model.ProjectCount</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span class="text-muted">Авторських багів</span>
+                <strong class="@(Model.AuthoredBugsCount > 0 ? "text-danger" : "")">
+                    @Model.AuthoredBugsCount
+                </strong>
+            </li>
+        </ul>
+    </div>
+
+    @if (Model.AuthoredBugsCount > 0)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Разом із користувачем буде видалено
+            <strong>@Model.AuthoredBugsCount баг(ів)</strong>, автором яких він є.
+        </div>
+    }
+
+    <div class="d-flex gap-2 justify-content-end">
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Скасувати
+        </a>
+        <form method="post">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash3"></i> Так, видалити
+            </button>
+        </form>
+    </div>
+</div>

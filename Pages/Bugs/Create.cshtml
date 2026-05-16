@@ -1,0 +1,86 @@
+@page
+@model BugTrackingSystem.Pages.Bugs.CreateModel
+@{
+    ViewData["Title"] = "Створити баг";
+}
+
+<h1><i class="bi bi-bug"></i> Новий баг</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Bug.Title" class="control-label fw-bold">Назва</label>
+                        <input asp-for="Bug.Title" class="form-control" placeholder="Короткий опис проблеми" />
+                        <span asp-validation-for="Bug.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Bug.Description" class="control-label fw-bold">Опис</label>
+                        <textarea asp-for="Bug.Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Bug.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Bug.Priority" class="control-label fw-bold">Пріоритет</label>
+                                <select asp-for="Bug.Priority" class="form-control" asp-items="Html.GetEnumSelectList<BugTrackingSystem.Models.BugPriority>()"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Bug.Status" class="control-label fw-bold">Статус</label>
+                                <select asp-for="Bug.Status" class="form-control" asp-items="Html.GetEnumSelectList<BugTrackingSystem.Models.BugStatus>()"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Bug.ProjectId" class="control-label fw-bold">Проєкт</label>
+                                <select asp-for="Bug.ProjectId" class="form-control" asp-items="Model.ProjectsList">
+                                    <option value="">-- Без проєкту --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Bug.AssignedToId" class="control-label fw-bold">Призначити на</label>
+                                <select asp-for="Bug.AssignedToId" class="form-control" asp-items="Model.UsersList">
+                                    <option value="">-- Не призначено --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Створити
+                        </button>
+                        <a asp-page="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Скасувати
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="alert alert-info">
+            <h5>Порада</h5>
+            <p>Намагайтеся описувати баг максимально детально, вказуючи кроки для відтворення помилки.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,188 @@
+@page
+@model BugTrackingSystem.Pages.IndexModel
+@using BugTrackingSystem.Models
+@using BugTrackingSystem.Extensions
+@{
+    ViewData["Title"] = "Панель керування";
+}
+
+<style>
+    .dashboard-greeting { font-weight: 700; }
+    .task-row:hover { background-color: #f8f9fa; }
+    .priority-dot {
+        display: inline-block;
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+    }
+    .dot-high   { background: #dc3545; }
+    .dot-medium { background: #ffc107; }
+    .dot-low    { background: #198754; }
+    .project-card { transition: box-shadow .2s; }
+    .project-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12) !important; }
+    .quick-action-btn {
+        font-size: 1.1rem;
+        padding: .75rem 2rem;
+        border-radius: 2rem;
+        box-shadow: 0 4px 14px rgba(13,110,253,.35);
+        transition: transform .15s, box-shadow .15s;
+    }
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13,110,253,.45);
+    }
+</style>
+
+@* ── Вітання та кнопка швидкої дії ── *@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+    <div>
+        <h1 class="dashboard-greeting mb-1">
+            Привіт, @Model.UserName! 👋
+        </h1>
+        <p class="text-muted mb-0">Ось що відбувається у ваших проєктах</p>
+    </div>
+    <a asp-page="/Bugs/Create" class="btn btn-primary quick-action-btn">
+        <i class="bi bi-plus-lg me-2"></i>Створити баг
+    </a>
+</div>
+
+<div class="row g-4">
+
+    @* ── Мої актуальні завдання ── *@
+    <div class="col-lg-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-list-task text-primary"></i>
+                <span class="fw-semibold">Мої актуальні завдання</span>
+                @if (Model.ActiveTasks.Any())
+                {
+                    <span class="badge bg-primary ms-auto">@Model.ActiveTasks.Count</span>
+                }
+            </div>
+
+            @if (!Model.ActiveTasks.Any())
+            {
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-check-circle text-success" style="font-size:2.5rem;"></i>
+                    <p class="mt-3 mb-0 fw-semibold text-success">Чудова робота!</p>
+                    <p class="text-muted small mb-0">Усі ваші баги закриті!</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:60px">#</th>
+                                <th>Назва</th>
+                                <th style="width:120px">Пріоритет</th>
+                                <th style="width:110px">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bug in Model.ActiveTasks)
+                            {
+                                var dotClass = bug.Priority switch
+                                {
+                                    BugPriority.High   => "dot-high",
+                                    BugPriority.Medium => "dot-medium",
+                                    _                  => "dot-low"
+                                };
+                                var statusBadge = bug.Status switch
+                                {
+                                    BugStatus.New        => "bg-primary",
+                                    BugStatus.InProgress => "bg-info text-dark",
+                                    BugStatus.Resolved   => "bg-success",
+                                    BugStatus.Closed     => "bg-secondary",
+                                    _                    => "bg-secondary"
+                                };
+                                <tr class="task-row">
+                                    <td class="text-muted small">@bug.Id</td>
+                                    <td>
+                                        <a asp-page="/Bugs/Details" asp-route-id="@bug.Id"
+                                           class="text-decoration-none fw-semibold text-dark">
+                                            @bug.Title
+                                        </a>
+                                        @if (bug.Project != null)
+                                        {
+                                            <div class="text-muted small">@bug.Project.Name</div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="priority-dot @dotClass"></span>
+                                        @bug.Priority.GetDisplayName()
+                                    </td>
+                                    <td>
+                                        <span class="badge @statusBadge">@bug.Status.GetDisplayName()</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* ── Мої проєкти ── *@
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-folder2-open text-primary"></i>
+                <span class="fw-semibold">Мої проєкти</span>
+                @if (Model.MyProjects.Any())
+                {
+                    <span class="badge bg-secondary ms-auto">@Model.MyProjects.Count</span>
+                }
+            </div>
+
+            @if (!Model.MyProjects.Any())
+            {
+                <div class="card-body text-center py-5 text-muted">
+                    <i class="bi bi-folder-x" style="font-size:2.5rem;"></i>
+                    <p class="mt-3 mb-0 small">Ви ще не є учасником жодного проєкту.</p>
+                </div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var ps in Model.MyProjects)
+                    {
+                        <li class="list-group-item project-card px-3 py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <a asp-page="/Bugs/Index" asp-route-projectId="@ps.Project.Id"
+                                       class="fw-semibold text-decoration-none text-dark">
+                                        @ps.Project.Name
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(ps.Project.Description))
+                                    {
+                                        <div class="text-muted small text-truncate" style="max-width:200px;">
+                                            @ps.Project.Description
+                                        </div>
+                                    }
+                                </div>
+                                <div class="text-end text-nowrap small ms-3">
+                                    <span class="text-muted">Всього:</span>
+                                    <strong>@ps.TotalBugs</strong>
+                                    <span class="mx-1 text-muted">|</span>
+                                    <span class="text-muted">Відкритих:</span>
+                                    @if (ps.OpenBugs > 0)
+                                    {
+                                        <strong class="text-danger">@ps.OpenBugs</strong>
+                                    }
+                                    else
+                                    {
+                                        <strong class="text-success">0</strong>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+</div>

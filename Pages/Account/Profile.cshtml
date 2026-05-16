@@ -1,0 +1,40 @@
+@page
+@model BugTrackingSystem.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "Профіль користувача";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-person-badge"></i> Профіль</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-circle display-1 text-muted"></i>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th class="border-0">Email:</th>
+                            <td class="border-0">@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <th>Ваша роль:</th>
+                            <td>
+                                @foreach (var role in Model.Roles)
+                                {
+                                    <span class="badge bg-dark">@role</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="mt-4 text-center">
+                        <p class="text-muted small">Дані отримано з системи Identity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+@page "{id:int}"
+@model BugTrackingSystem.Pages.Bugs.DetailsModel
+@using BugTrackingSystem.Models
+@{
+    ViewData["Title"] = "Деталі бага";
+
+    var priorityBadgeClass = Model.Bug.Priority switch
+    {
+        BugPriority.High => "bg-danger",
+        BugPriority.Medium => "bg-warning text-dark",
+        BugPriority.Low => "bg-success",
+        _ => "bg-secondary"
+    };
+
+    var statusBadgeClass = Model.Bug.Status switch
+    {
+        BugStatus.New => "bg-primary",
+        BugStatus.InProgress => "bg-info text-dark",
+        BugStatus.Resolved => "bg-success",
+        BugStatus.Closed => "bg-secondary",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Деталі бага #@Model.Bug.Id</h1>
+        <div class="d-flex gap-2">
+            <a asp-page="./Edit" asp-route-id="@Model.Bug.Id" class="btn btn-outline-warning">
+                <i class="bi bi-pencil"></i> Редагувати
+            </a>
+            @if (Model.CanDelete)
+            {
+                <a asp-page="./Delete" asp-route-id="@Model.Bug.Id" class="btn btn-danger">
+                    <i class="bi bi-trash3"></i> Видалити
+                </a>
+            }
+            <a asp-page="./Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h3 class="mb-0">@Model.Bug.Title</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5>Опис</h5>
+                    <p class="text-pre-wrap">@Model.Bug.Description</p>
+                </div>
+                <div class="col-md-4 border-start">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Статус:</strong> 
+                            <span class="badge @statusBadgeClass">@Model.Bug.Status.GetDisplayName()</span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Пріоритет:</strong> 
+                            <span class="badge @priorityBadgeClass">@Model.Bug.Priority.GetDisplayName()</span>
+                        </li>
+                        <li class="list-group-item"><strong>Проєкт:</strong> @(Model.Bug.Project?.Name ?? "Не вказано")</li>
+                        <li class="list-group-item"><strong>Автор:</strong> @Model.Bug.Author?.UserName</li>
+                        <li class="list-group-item"><strong>Виконавець:</strong> @(Model.Bug.AssignedTo?.UserName ?? "Не призначено")</li>
+                        <li class="list-group-item"><strong>Створено:</strong> @Model.Bug.CreatedAt.ToString("f")</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
