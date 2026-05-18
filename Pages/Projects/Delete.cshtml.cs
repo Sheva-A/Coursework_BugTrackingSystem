@@ -47,12 +47,12 @@ namespace BugTrackingSystem.Pages.Projects
             var project = await _context.Projects.FindAsync(id);
             if (project == null) return NotFound();
 
-            // Unlink bugs (set ProjectId = null) — bugs are not deleted
+            // Від'єднуємо баги від проєкту (ProjectId = null) — баги не видаляються
             var projectBugs = await _context.Bugs.Where(b => b.ProjectId == id).ToListAsync();
             foreach (var bug in projectBugs)
                 bug.ProjectId = null;
 
-            // Members are cascade-deleted by the FK, no need to remove manually
+            // Учасники видаляються каскадно через FK
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
 

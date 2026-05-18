@@ -23,7 +23,7 @@ namespace BugTrackingSystem.Pages.Projects
         [BindProperty]
         public Project Project { get; set; } = default!;
 
-        // IDs of users selected as project members
+        /// <summary>ІД користувачів, обраних учасниками проєкту.</summary>
         [BindProperty]
         public List<string> SelectedUserIds { get; set; } = new();
 
@@ -43,10 +43,11 @@ namespace BugTrackingSystem.Pages.Projects
                 return Page();
             }
 
+            // Спочатку зберігаємо проєкт, щоб отримати його Id
             _context.Projects.Add(Project);
             await _context.SaveChangesAsync();
 
-            // Add selected members
+            // Потім додаємо учасників
             foreach (var userId in SelectedUserIds)
             {
                 _context.ProjectMembers.Add(new ProjectMember

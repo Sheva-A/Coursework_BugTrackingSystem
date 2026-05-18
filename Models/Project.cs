@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BugTrackingSystem.Models
 {
@@ -11,9 +12,11 @@ namespace BugTrackingSystem.Models
         public int Id { get; set; }
 
         /// <summary>Назва проєкту.</summary>
+        [Required(ErrorMessage = "Вкажіть назву проєкту")]
         public string Name { get; set; }
 
         /// <summary>Короткий опис проєкту.</summary>
+        [Required(ErrorMessage = "Вкажіть опис проєкту")]
         public string Description { get; set; }
 
         /// <summary>Баги, прив'язані до цього проєкту.</summary>

@@ -5,6 +5,9 @@ using BugTrackingSystem.Models;
 
 namespace BugTrackingSystem.Pages.Account
 {
+    /// <summary>
+    /// Вихід з системи. Підтримує і GET, і POST, щоб покривати вихід з будь-якого місця.
+    /// </summary>
     [IgnoreAntiforgeryToken]
     public class LogoutModel : PageModel
     {
@@ -21,10 +24,7 @@ namespace BugTrackingSystem.Pages.Account
             return RedirectToPage("/Account/Login");
         }
 
-        public async Task<IActionResult> OnGetAsync()
-        {
-            await _signInManager.SignOutAsync();
-            return RedirectToPage("/Account/Login");
-        }
+        // Підтримуємо GET для випадків виходу за прямим посиланням
+        public Task<IActionResult> OnGetAsync() => OnPostAsync();
     }
 }

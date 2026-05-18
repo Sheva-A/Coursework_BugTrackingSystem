@@ -70,7 +70,7 @@ namespace BugTrackingSystem.Pages.Projects
             existingProject.Name = Project.Name;
             existingProject.Description = Project.Description;
 
-            // Sync members: remove old, add new
+            // Синхронізуємо список учасників: видаляємо знятих, додаємо нових
             var currentMemberIds = existingProject.Members.Select(m => m.UserId).ToHashSet();
             var newMemberIds = SelectedUserIds.ToHashSet();
 

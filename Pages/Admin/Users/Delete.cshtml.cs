@@ -11,8 +11,8 @@ namespace BugTrackingSystem.Pages.Admin.Users
 {
     /// <summary>
     /// Сторінка підтвердження видалення користувача (лише для адміністратора).
-    /// При видаленні всі баги, де користувач є автором, також видаляються,
-    /// оскільки FK Author→Bug налаштовано як Restrict.
+    /// FK Bug→Author налаштовано як Restrict, тому баги автора видаляються вручну перед видаленням користувача.
+    /// Членство в проєктах та призначення на багах видаляються каскадно/SetNull.
     /// </summary>
     [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel
@@ -42,8 +42,8 @@ namespace BugTrackingSystem.Pages.Admin.Users
             if (user.Id == User.FindFirstValue(ClaimTypes.NameIdentifier)) return Forbid();
             if (await _userManager.IsInRoleAsync(user, AppRoles.Admin)) return Forbid();
 
-            TargetUser       = user;
-            TargetRoles      = (await _userManager.GetRolesAsync(user)).ToList();
+            TargetUser        = user;
+            TargetRoles       = (await _userManager.GetRolesAsync(user)).ToList();
             AuthoredBugsCount = await _context.Bugs.CountAsync(b => b.AuthorId == id);
             ProjectCount      = await _context.ProjectMembers.CountAsync(pm => pm.UserId == id);
 
@@ -61,12 +61,12 @@ namespace BugTrackingSystem.Pages.Admin.Users
             if (user.Id == User.FindFirstValue(ClaimTypes.NameIdentifier)) return Forbid();
             if (await _userManager.IsInRoleAsync(user, AppRoles.Admin)) return Forbid();
 
-            // Видалити баги, де користувач є автором (Restrict FK не дозволяє автоматичного видалення)
+            // Restrict FK не дозволяє видалення автора з активними багами — видаляємо вручну
             var authoredBugs = await _context.Bugs.Where(b => b.AuthorId == id).ToListAsync();
             _context.Bugs.RemoveRange(authoredBugs);
             await _context.SaveChangesAsync();
 
-            // Видалити користувача (ProjectMembers видаляться каскадно, AssignedBugs → SetNull)
+            // Після видалення багів: ProjectMembers → Cascade, AssignedBugs → SetNull
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {

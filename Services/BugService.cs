@@ -17,13 +17,11 @@ namespace BugTrackingSystem.Services
         /// <inheritdoc/>
         public IQueryable<Bug> GetBugsQuery(int? projectId = null)
         {
-            var query = _context.Bugs
+            IQueryable<Bug> query = _context.Bugs
                 .Include(b => b.Author)
                 .Include(b => b.AssignedTo)
-                .Include(b => b.Project)
-                .AsQueryable();
+                .Include(b => b.Project);
 
-            // Фільтр за проєктом, якщо вказано
             if (projectId.HasValue)
                 query = query.Where(b => b.ProjectId == projectId.Value);
 

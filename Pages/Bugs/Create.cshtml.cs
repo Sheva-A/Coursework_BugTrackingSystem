@@ -48,12 +48,13 @@ namespace BugTrackingSystem.Pages.Bugs
 
             Bug.AuthorId = userId;
 
+            // Навігаційні властивості не прив'язуються з форми
             ModelState.Remove("Bug.Author");
             ModelState.Remove("Bug.AuthorId");
             ModelState.Remove("Bug.AssignedTo");
             ModelState.Remove("Bug.Project");
 
-            // Validate: assignee must be a member of the selected project
+            // Виконавець повинен бути учасником обраного проєкту
             if (Bug.ProjectId.HasValue && !string.IsNullOrEmpty(Bug.AssignedToId))
             {
                 var isMember = await _context.ProjectMembers.AnyAsync(pm =>
@@ -73,11 +74,12 @@ namespace BugTrackingSystem.Pages.Bugs
             return RedirectToPage("./Index");
         }
 
+        // Заповнює списки виконавців та проєктів з урахуванням обраного проєкту
         private async Task PopulateLists(int? projectId)
         {
-            // Filter assignees to project members if a project is selected
             if (projectId.HasValue)
             {
+                // Показуємо лише учасників обраного проєкту
                 var memberIds = await _context.ProjectMembers
                     .Where(pm => pm.ProjectId == projectId.Value)
                     .Select(pm => pm.UserId)
@@ -90,11 +92,11 @@ namespace BugTrackingSystem.Pages.Bugs
             }
             else
             {
+                // Без проєкту — усі користувачі
                 var all = await _userManager.Users.OrderBy(u => u.UserName).ToListAsync();
                 UsersList = new SelectList(all, "Id", "UserName");
             }
 
-            // Show only accessible projects
             var projectsQuery = _context.Projects.AsQueryable();
             projectsQuery = await _bugAccessService.ApplyProjectFilterAsync(User, projectsQuery);
             var projects = await projectsQuery.OrderBy(p => p.Name).ToListAsync();
